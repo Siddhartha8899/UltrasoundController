@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="normalPadding">20dp</dimen>
+    <dimen name="headerTextSize">15sp</dimen>
+    <dimen name="nav_header_height">176dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">8dp</dimen>
+    <dimen name="horizontal_dashboard">32dp</dimen>
+    <dimen name="top_text_subtitle_card">4dp</dimen>
+    <dimen name="horizontal_card">8dp</dimen>
+    <dimen name="staggedmarginbottom">21dp</dimen>
+    <dimen name="card_radius">14dp</dimen>
+    <dimen name="img_card_height">120dp</dimen>
+    <dimen name="top_text_card">14dp</dimen>
+    <dimen name="d_number_courses">11sp</dimen>
+
+</resources>

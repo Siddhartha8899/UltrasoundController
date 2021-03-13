@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Colors for content_main -->
+    <color name="contentBodyColor">#000</color>
+    <color name="contentNotConnected">#FAF7F7</color>
+    <color name="darkTextColor">#020000</color>
+    <color name="dashboard_subtitle">#B7B7CC</color>
+    <color name="back_courses">#f8fafb</color>
 </resources>
