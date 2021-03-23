@@ -25,6 +25,7 @@ public class MyApplication extends Application
     BluetoothAdapter bluetoothAdapter;
     BluetoothDevice[] btArray;
     ClientClass clientClass;
+    String device_connected;
     static final int CONNECTING = 1;
     static final int CONNECTION_SUCCEEDED = 0;
     static final int CONNECTION_FAILED = -1;
@@ -33,6 +34,7 @@ public class MyApplication extends Application
         super.onCreate();
         bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
         clientClass = null;
+        device_connected = "";
         sInstance = this;
     }
 
