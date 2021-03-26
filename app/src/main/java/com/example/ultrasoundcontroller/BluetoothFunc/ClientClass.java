@@ -1,7 +1,9 @@
-package com.example.ultrasoundcontroller;
+package com.example.ultrasoundcontroller.BluetoothFunc;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+
+import com.example.ultrasoundcontroller.MyApplication;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -31,7 +33,6 @@ public class ClientClass extends Thread {
             socket.connect();
             isConnected = MyApplication.getApplication().CONNECTION_SUCCEEDED;
             sendReceive=new SendReceive(socket);
-            sendReceive.start();
 
         } catch (IOException e) {
             isConnected = MyApplication.getApplication().CONNECTION_FAILED;

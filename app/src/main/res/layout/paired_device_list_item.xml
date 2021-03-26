@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/pared_list_item">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/pared_list_item"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/name_of_device"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:padding="25dp"
-        android:text="Samsun Galaxy S8"
+        android:paddingTop="25dp"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:text="Samsung Galaxy S8"
         android:textColor="#FCFCFC"
         android:textSize="18sp" />
 
@@ -18,9 +21,8 @@
         android:id="@+id/connection_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:padding="25dp"
+        android:paddingLeft="25dp"
         android:text=""
         android:textColor="#FCFCFC"
         android:textStyle="bold|italic" />
-</RelativeLayout>
+</LinearLayout>

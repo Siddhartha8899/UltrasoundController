@@ -3,16 +3,12 @@ package com.example.ultrasoundcontroller;
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
-import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
-import java.io.IOException;
-import java.net.Socket;
+import com.example.ultrasoundcontroller.BluetoothFunc.ClientClass;
+import com.example.ultrasoundcontroller.BluetoothFunc.SendReceive;
+import com.example.ultrasoundcontroller.Interface.SuperNode;
+
 import java.util.Set;
-import java.util.UUID;
 
 public class MyApplication extends Application
 {
@@ -24,11 +20,14 @@ public class MyApplication extends Application
 
     BluetoothAdapter bluetoothAdapter;
     BluetoothDevice[] btArray;
-    ClientClass clientClass;
-    String device_connected;
-    static final int CONNECTING = 1;
-    static final int CONNECTION_SUCCEEDED = 0;
-    static final int CONNECTION_FAILED = -1;
+    public ClientClass clientClass;
+    public String device_connected;
+    public static final int CONNECTING = 1;
+    public static final int CONNECTION_SUCCEEDED = 0;
+    public static final int CONNECTION_FAILED = -1;
+
+
+    SuperNode superNode;
 
     public void onCreate() {
         super.onCreate();
@@ -36,6 +35,7 @@ public class MyApplication extends Application
         clientClass = null;
         device_connected = "";
         sInstance = this;
+        superNode = new SuperNode();
     }
 
     public boolean isBluetoothEnabled() {
@@ -76,5 +76,7 @@ public class MyApplication extends Application
     public SendReceive getSendReceive() {
         return clientClass.getSendReceive();
     }
+
+    public SuperNode getSuperNode() {return superNode; }
 
 }

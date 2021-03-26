@@ -1,37 +1,28 @@
-package com.example.ultrasoundcontroller;
+package com.example.ultrasoundcontroller.BluetoothFunc;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.DialogFragment;
 
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
-
-import org.w3c.dom.Text;
+import com.example.ultrasoundcontroller.MainActivity;
+import com.example.ultrasoundcontroller.MyApplication;
+import com.example.ultrasoundcontroller.R;
 
 import java.io.IOException;
 
@@ -39,10 +30,14 @@ public class FragmentPairedDevices extends DialogFragment {
 
     String[] strings;
     PairedListViewCustomAdapter adapter;
+    int paddingPixel;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        int paddingDp = 25;
+        float density = getContext().getResources().getDisplayMetrics().density;
+        paddingPixel = (int)(paddingDp * density);
 
         /* Get all the paired devices and store them in a string array. */
         strings = MyApplication.getApplication().getPairedDevices();
@@ -75,7 +70,7 @@ public class FragmentPairedDevices extends DialogFragment {
 
         public MainActivity main;
         TextView connection_status;
-        RelativeLayout row;
+        LinearLayout row;
         View clicked_view;
         int clicked_position;
 
@@ -103,6 +98,7 @@ public class FragmentPairedDevices extends DialogFragment {
             main.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    connection_status.setPadding(paddingPixel,0,paddingPixel,paddingPixel);
                     connection_status.setText("Connecting...");
                     row.setBackgroundColor(Color.parseColor("#FFC30B"));
 
@@ -137,12 +133,12 @@ public class FragmentPairedDevices extends DialogFragment {
         }
 
         void disconnect_device() {
+            MyApplication.getApplication().device_connected = "";
             main.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    connection_status.setText("Disconnected");
-                    row.setBackgroundColor(Color.parseColor("#CF0000"));
-                    MyApplication.getApplication().device_connected = "";
+                    connection_status.setText("");
+                    row.setBackgroundColor(Color.GRAY);
                     ViewCompat.setBackgroundTintList(main.bluetoothImage, ColorStateList.valueOf(Color.parseColor("#CF0000")));
 
                 }

@@ -1,11 +1,11 @@
-package com.example.ultrasoundcontroller;
+package com.example.ultrasoundcontroller.BluetoothFunc;
 
 import android.bluetooth.BluetoothSocket;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class SendReceive extends Thread {
+public class SendReceive {
 
     private final BluetoothSocket bluetoothSocket;
     private final OutputStream outputStream;

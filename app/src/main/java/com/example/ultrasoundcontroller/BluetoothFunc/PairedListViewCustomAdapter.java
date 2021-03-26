@@ -1,4 +1,4 @@
-package com.example.ultrasoundcontroller;
+package com.example.ultrasoundcontroller.BluetoothFunc;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,16 +8,22 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.ultrasoundcontroller.MyApplication;
+import com.example.ultrasoundcontroller.R;
+
 public class PairedListViewCustomAdapter extends BaseAdapter {
 
     String[] names_of_devices;
     Context mCtxl;
     boolean clickable;
-
+    int paddingPixel;
     PairedListViewCustomAdapter(Context mCtxl, String[] names_of_devices) {
         this.mCtxl = mCtxl;
         this.names_of_devices = names_of_devices;
         clickable = true;
+        int paddingDp = 25;
+        float density = mCtxl.getResources().getDisplayMetrics().density;
+        paddingPixel = (int)(paddingDp * density);
 
     }
 
@@ -44,6 +50,7 @@ public class PairedListViewCustomAdapter extends BaseAdapter {
         TextView connection_status = row.findViewById(R.id.connection_status);
         device.setText(names_of_devices[position]);
         if(names_of_devices[position].equals(MyApplication.getApplication().device_connected)){
+            connection_status.setPadding(paddingPixel,0,paddingPixel,paddingPixel);
             connection_status.setText("Connected");
             row.setBackgroundColor(Color.parseColor("#4C9A2A"));
         }

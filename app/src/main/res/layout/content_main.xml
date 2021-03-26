@@ -5,22 +5,32 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.ultrasoundcontroller.MainActivity"
-    style="@style/parent.contentLayout">
+    style="@style/parent.contentLayout"
+    >
 
-<!--    <androidx.core.widget.NestedScrollView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent">-->
-
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                >
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/back"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_baseline_arrow_back_24"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"/>
+
                 <Button
                     android:id="@+id/menu"
                     android:layout_width="40dp"
@@ -31,6 +41,27 @@
                     android:background="@drawable/ic_baseline_menu_24"
                     android:layout_centerHorizontal="true" />
 
+                <Button
+                    android:id="@+id/add"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_baseline_add_24"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"/>
+
+                <TextView
+                    android:id="@+id/name_of_directory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="Organs"
+                    android:fontFamily="@font/bariol_bold"
+                    android:textColor="#FCFCFC"
+                    android:textSize="20sp"/>
 
             </RelativeLayout>
 
@@ -38,51 +69,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-<!--                <ImageView-->
-<!--                    android:id="@+id/imageView2"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:scaleType="centerInside"-->
-<!--                    android:layout_centerVertical="true"-->
-<!--                    android:layout_centerHorizontal="true"-->
-<!--                    app:srcCompat="@mipmap/human" />-->
-
-
-                <TextView
-                    android:id="@+id/heart_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:text="Heart"
-                    android:layout_marginTop="30dp"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-<!--                HEAD: To demonstrate that communication is happening.-->
-<!--                <EditText-->
-<!--                    android:id="@+id/editTextTextPersonName"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:ems="10"-->
-<!--                    android:hint="Send something"-->
-<!--                    android:inputType="textPersonName" />-->
-
-<!--                <Button-->
-<!--                    android:id="@+id/button2"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="Send"-->
-<!--                    android:layout_toRightOf="@+id/editTextTextPersonName"/>-->
-<!--                HEAD: This is a grid view, not deleting it yet-->
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_marginTop="80dp"-->
-<!--                    android:background="@color/back_courses"-->
-<!--                    android:orientation="vertical">-->
-
-<!--                </LinearLayout>-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -91,7 +77,7 @@
                     android:layout_marginBottom="@dimen/horizontal_card">
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_courses"
+                        android:id="@+id/organs"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="@dimen/horizontal_dashboard"
@@ -112,10 +98,10 @@
 
         </LinearLayout>
 
+    </androidx.core.widget.NestedScrollView>
 
 
 
-<!--    </androidx.core.widget.NestedScrollView>-->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/bluetoothImage"

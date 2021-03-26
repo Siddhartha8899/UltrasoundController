@@ -21,6 +21,7 @@
     app:cardPreventCornerOverlap="false">
 
     <LinearLayout
+        android:id="@+id/item"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -29,40 +30,22 @@
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="@dimen/img_card_height"
-            android:scaleType="centerCrop"
-            android:src="@mipmap/ic_heart_foreground"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_heart"
             android:contentDescription="@string/app_name" />
 
         <TextView
-            android:id="@+id/organ"
+            android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/normalPadding"
             android:layout_marginTop="@dimen/top_text_card"
-
             android:layout_marginRight="@dimen/normalPadding"
-
-
+            android:layout_marginBottom="@dimen/normalPadding"
             android:fontFamily="@font/bariol_bold"
             android:text="Heart"
             android:textColor="@color/darkTextColor"
             android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/number_of_scenarios"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/normalPadding"
-            android:layout_marginTop="@dimen/top_text_subtitle_card"
-
-            android:layout_marginRight="@dimen/normalPadding"
-            android:layout_marginBottom="@dimen/normalPadding"
-
-            android:fontFamily="@font/bariol_bold"
-
-            android:text="6 scenarios"
-            android:textColor="@color/dashboard_subtitle"
-            android:textSize="@dimen/d_number_courses" />
 
 
     </LinearLayout>
