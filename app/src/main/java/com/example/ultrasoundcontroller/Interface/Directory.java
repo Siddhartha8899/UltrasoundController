@@ -7,13 +7,17 @@ import java.util.Vector;
 
 public class Directory {
     public static final int ROOT_DIRECTORY = 0;
+
+    /* Directory contents. */
     public Vector<Integer> images;
     public Vector<String> names;
+    public Vector<Integer> inodes;
+    public Vector<String> type;
+
+    /* Info about the directory.*/
     public int currentDirectoryInode;
     public int parentDirectoryInode;
     public String nameOfDirectory;
-    Vector<Integer> inodes;
-    Vector<String> type;
 
     public Directory(int currentDirectoryInode, int parentDirectoryInode, String nameOfDirectory, int[] images, String[] names) {
         this.currentDirectoryInode = currentDirectoryInode;
@@ -24,14 +28,14 @@ public class Directory {
         this.inodes = new Vector<Integer>();
         this.type = new Vector<String>();
 
-//        if(currentDirectoryInode == ROOT_DIRECTORY) {
-            for (int i = 0; i < names.length; i++) {
-                this.images.add(images[i]);
-                this.names.add(names[i]);
-                this.inodes.add(0);
-                this.type.add("");
-//            }
+
+        for (int i = 0; names != null && i < names.length; i++) {
+            this.images.add(images[i]);
+            this.names.add(names[i]);
+            this.inodes.add(-1);
+            this.type.add("");
         }
+
         MyApplication.getApplication().getSuperNode().hashMap.put(currentDirectoryInode,new Directory(this));
         MyApplication.getApplication().getSuperNode().total_inode++;
     }
@@ -54,6 +58,7 @@ public class Directory {
         }
     }
 
+    /* Only used by the Recycler View and the Adapter. */
     public void change(Directory d) {
         this.currentDirectoryInode = d.currentDirectoryInode;
         this.parentDirectoryInode = d.parentDirectoryInode;

@@ -2,6 +2,7 @@ package com.example.ultrasoundcontroller.Interface;
 
 import android.content.Context;
 import android.content.Intent;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.example.ultrasoundcontroller.MainActivity;
 import com.example.ultrasoundcontroller.MyApplication;
 import com.example.ultrasoundcontroller.R;
 
+import java.nio.InvalidMarkException;
 import java.util.ArrayList;
 
 public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyViewHolder> {
@@ -46,25 +48,33 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
             holder._linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Directory d;
-                    if(MyApplication.getApplication().getSuperNode().hashMap.get(directory.currentDirectoryInode).inodes.get(position) == 0) {
+                    Directory clicked_dir;
+                    Directory current_dir = MyApplication.getApplication().getSuperNode().hashMap.get(directory.currentDirectoryInode);
+                    int inode_of_clicked_dir = current_dir.inodes.get(position);
+
+                    /* If -1 then the directory hasn't been created and we have to create it. */
+                    if( inode_of_clicked_dir == -1) {
+                        /* Get a new Inode number. */
                         int inode = MyApplication.getApplication().getSuperNode().total_inode;
-                        int images[] = { R.mipmap.ic_folder};
-                        String names[] = {"Left View"};
-                        d = new Directory(inode, directory.currentDirectoryInode, directory.names.get(position), images, names);
-                        MyApplication.getApplication().getSuperNode().hashMap.get(directory.currentDirectoryInode).inodes.set(position, inode);
-                        MyApplication.getApplication().getSuperNode().hashMap.get(directory.currentDirectoryInode).type.set(position, "Dir");
+
+                        /* Create a new directory. */
+                        clicked_dir = new Directory(inode, directory.currentDirectoryInode, current_dir.names.get(position), null, null);
+
+                        /* Provide information to the parent directory about the new directory. */
+                        current_dir.inodes.set(position, inode);
+                        current_dir.type.set(position, "Dir");
                     } else{
-                        d = MyApplication.getApplication().getSuperNode().hashMap.get(directory.inodes.get(position) );
+                        clicked_dir = MyApplication.getApplication().getSuperNode().hashMap.get(inode_of_clicked_dir);
                     }
 
-                    ((MainActivity) v.getContext()).nameOfDirectory.setText(directory.names.get(position));
+                    /* Make some layout changes. */
+                    ((MainActivity) v.getContext()).nameOfDirectory.setText(clicked_dir.nameOfDirectory);
                     if(directory.currentDirectoryInode == 0) {
                         ((MainActivity) v.getContext()).menu.setVisibility(View.INVISIBLE);
                         ((MainActivity) v.getContext()).back.setVisibility(View.VISIBLE);
                         ((MainActivity) v.getContext()).add.setVisibility(View.VISIBLE);
                     }
-                    ((MainActivity) v.getContext()).reloadRecyclerView(d);
+                    ((MainActivity) v.getContext()).reloadRecyclerView(clicked_dir);
 
 
                 }

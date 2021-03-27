@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="350dp"
+    android:background="#2f333f"
+    android:padding="5dp"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/name_of_device"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create New Directory"
+        android:textColor="#FCFCFC"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/name_the_directory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name "
+        android:padding="15dp"
+        android:layout_margin="20dp"
+        android:textColor="#FCFCFC"
+        android:textSize="18sp"
+
+        />
+
+    <RadioGroup
+        android:id="@+id/type_of_directory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="0dp"
+        android:orientation="horizontal"
+        android:layout_gravity="start"
+        >
+
+        <RadioButton
+            android:id="@+id/folder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Folder"
+            android:layout_margin="12dp"
+            android:checked="true"
+            />
+        <RadioButton
+            android:id="@+id/file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="File"
+            android:layout_margin="12dp"/>
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/create_directory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="CREATE"
+        android:background="@color/purple_200"
+        android:layout_gravity="center"
+
+        />
+
+</LinearLayout>
