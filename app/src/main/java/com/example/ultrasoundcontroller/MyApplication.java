@@ -35,7 +35,6 @@ public class MyApplication extends Application
         clientClass = null;
         device_connected = "";
         sInstance = this;
-        superNode = new SuperNode();
     }
 
     public boolean isBluetoothEnabled() {

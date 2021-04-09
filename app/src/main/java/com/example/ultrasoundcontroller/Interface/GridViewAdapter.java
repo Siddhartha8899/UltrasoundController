@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,31 +53,34 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
                     Directory current_dir = MyApplication.getApplication().getSuperNode().hashMap.get(directory.currentDirectoryInode);
                     int inode_of_clicked_dir = current_dir.inodes.get(position);
 
-                    /* If -1 then the directory hasn't been created and we have to create it. */
-                    if( inode_of_clicked_dir == -1) {
-                        /* Get a new Inode number. */
-                        int inode = MyApplication.getApplication().getSuperNode().total_inode;
+                    clicked_dir = MyApplication.getApplication().getSuperNode().hashMap.get(inode_of_clicked_dir);
 
-                        /* Create a new directory. */
-                        clicked_dir = new Directory(inode, directory.currentDirectoryInode, current_dir.names.get(position), null, null);
-
-                        /* Provide information to the parent directory about the new directory. */
-                        current_dir.inodes.set(position, inode);
-                        current_dir.type.set(position, "Dir");
-                    } else{
-                        clicked_dir = MyApplication.getApplication().getSuperNode().hashMap.get(inode_of_clicked_dir);
+                    if(current_dir.type.get(position).equals("Dir")) {
+                        /* Make some layout changes. */
+                        ((MainActivity) v.getContext()).nameOfDirectory.setText(clicked_dir.nameOfDirectory);
+                        if (directory.currentDirectoryInode == 0) {
+                            ((MainActivity) v.getContext()).menu.setVisibility(View.INVISIBLE);
+                            ((MainActivity) v.getContext()).back.setVisibility(View.VISIBLE);
+                        }
+                        ((MainActivity) v.getContext()).reloadRecyclerView(clicked_dir);
+                    } else {
+                        if(MyApplication.getApplication().clientClass != null) {
+                            String s = clicked_dir.videoID;
+                            MyApplication.getApplication().getSendReceive().write(s.getBytes());
+                        } else {
+                            Toast.makeText(mCtx,"Not connected to the Simulator", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
-                    /* Make some layout changes. */
-                    ((MainActivity) v.getContext()).nameOfDirectory.setText(clicked_dir.nameOfDirectory);
-                    if(directory.currentDirectoryInode == 0) {
-                        ((MainActivity) v.getContext()).menu.setVisibility(View.INVISIBLE);
-                        ((MainActivity) v.getContext()).back.setVisibility(View.VISIBLE);
-                        ((MainActivity) v.getContext()).add.setVisibility(View.VISIBLE);
-                    }
-                    ((MainActivity) v.getContext()).reloadRecyclerView(clicked_dir);
 
+                }
+            });
 
+            holder._linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    ((MainActivity) v.getContext()).onLongTileClick();
+                    return true;
                 }
             });
 

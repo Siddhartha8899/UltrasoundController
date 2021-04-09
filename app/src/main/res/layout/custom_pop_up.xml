@@ -10,7 +10,7 @@
     android:gravity="center">
 
     <TextView
-        android:id="@+id/name_of_device"
+        android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create New Directory"
@@ -28,33 +28,50 @@
         android:textSize="18sp"
 
         />
-
-    <RadioGroup
-        android:id="@+id/type_of_directory"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="0dp"
         android:orientation="horizontal"
-        android:layout_gravity="start"
-        >
+        android:layout_gravity="start">
 
-        <RadioButton
-            android:id="@+id/folder"
+        <RadioGroup
+            android:id="@+id/type_of_directory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Folder"
-            android:layout_margin="12dp"
-            android:checked="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="0dp"
+            android:orientation="horizontal"
+            >
+
+            <RadioButton
+                android:id="@+id/folder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Folder"
+                android:layout_margin="12dp"
+                android:checked="true"
+                />
+            <RadioButton
+                android:id="@+id/file"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="File"
+                android:layout_margin="12dp"/>
+
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/video_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ID "
+            android:padding="15dp"
+            android:textColor="#FCFCFC"
+            android:textSize="18sp"
+            android:visibility="invisible"
             />
-        <RadioButton
-            android:id="@+id/file"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="File"
-            android:layout_margin="12dp"/>
 
-    </RadioGroup>
+    </LinearLayout>
 
     <Button
         android:id="@+id/create_directory"
@@ -65,6 +82,19 @@
         android:background="@color/purple_200"
         android:layout_gravity="center"
 
+        />
+
+    <TextView
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:text="Delete Directory"
+        android:textColor="#CF0000"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:layout_marginTop="15sp"
+        android:visibility="invisible"
         />
 
 </LinearLayout>

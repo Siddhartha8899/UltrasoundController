@@ -18,11 +18,13 @@ public class Directory {
     public int currentDirectoryInode;
     public int parentDirectoryInode;
     public String nameOfDirectory;
+    public String videoID;
 
     public Directory(int currentDirectoryInode, int parentDirectoryInode, String nameOfDirectory, int[] images, String[] names) {
         this.currentDirectoryInode = currentDirectoryInode;
         this.parentDirectoryInode = parentDirectoryInode;
         this.nameOfDirectory = nameOfDirectory;
+        videoID = null;
         this.images = new Vector<Integer>();
         this.names = new Vector<String>();
         this.inodes = new Vector<Integer>();
@@ -44,6 +46,7 @@ public class Directory {
         this.currentDirectoryInode = d.currentDirectoryInode;
         this.parentDirectoryInode = d.parentDirectoryInode;
         this.nameOfDirectory = d.nameOfDirectory;
+        this.videoID = d.videoID;
 
         this.images = new Vector<Integer>();
         this.names = new Vector<String>();
@@ -63,6 +66,7 @@ public class Directory {
         this.currentDirectoryInode = d.currentDirectoryInode;
         this.parentDirectoryInode = d.parentDirectoryInode;
         this.nameOfDirectory = d.nameOfDirectory;
+        this.videoID = d.videoID;
 
         this.images.clear();
         this.names.clear();
