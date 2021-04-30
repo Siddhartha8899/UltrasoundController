@@ -30,22 +30,52 @@
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="@dimen/img_card_height"
+            android:contentDescription="@string/app_name"
             android:scaleType="fitCenter"
-            android:src="@mipmap/ic_heart"
-            android:contentDescription="@string/app_name" />
+            android:src="@mipmap/ic_heart" />
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/normalPadding"
-            android:layout_marginTop="@dimen/top_text_card"
-            android:layout_marginRight="@dimen/normalPadding"
-            android:layout_marginBottom="@dimen/normalPadding"
-            android:fontFamily="@font/bariol_bold"
-            android:text="Heart"
-            android:textColor="@color/darkTextColor"
-            android:textSize="15sp" />
+        <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+            >
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/edit">
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:fontFamily="@font/bariol_bold"
+                        android:text="Heart"
+                        android:layout_marginLeft="@dimen/normalPadding"
+                        android:layout_marginTop="@dimen/top_text_card"
+                        android:layout_marginBottom="@dimen/normalPadding"
+                        android:textColor="@color/darkTextColor"
+                        android:textSize="13sp"
+                        android:layout_centerVertical="true" />
+
+                    <Button
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/ic_baseline_edit_24"
+                        android:backgroundTint="@color/black"
+                        android:layout_toRightOf="@+id/name"
+                        android:layout_centerVertical="true"
+                        android:clickable="false"
+                        />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/delete"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/ic_baseline_delete_forever_24"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
 
 
     </LinearLayout>

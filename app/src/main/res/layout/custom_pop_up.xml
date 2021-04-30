@@ -84,17 +84,6 @@
 
         />
 
-    <TextView
-        android:id="@+id/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:text="Delete Directory"
-        android:textColor="#CF0000"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:layout_marginTop="15sp"
-        android:visibility="invisible"
-        />
+
 
 </LinearLayout>

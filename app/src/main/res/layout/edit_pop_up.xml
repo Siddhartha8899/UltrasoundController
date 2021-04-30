@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="350dp"
+    android:background="#2f333f"
+    android:padding="5dp"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rename Directory"
+        android:textColor="#FCFCFC"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/name_the_directory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name "
+        android:padding="15dp"
+        android:layout_margin="20dp"
+        android:textColor="#FCFCFC"
+        android:textSize="18sp"
+
+        />
+
+    <EditText
+        android:id="@+id/edit_video_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="ID "
+        android:padding="15dp"
+        android:textColor="#FCFCFC"
+        android:textSize="18sp"
+        android:visibility="invisible"
+        />
+
+    <Button
+        android:id="@+id/rename_directory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Update"
+        android:background="@color/purple_200"
+        android:layout_gravity="center"
+
+        />
+
+</LinearLayout>

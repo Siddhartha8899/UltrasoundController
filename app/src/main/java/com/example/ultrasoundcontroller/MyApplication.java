@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 
 import com.example.ultrasoundcontroller.BluetoothFunc.ClientClass;
 import com.example.ultrasoundcontroller.BluetoothFunc.SendReceive;
-import com.example.ultrasoundcontroller.Interface.SuperNode;
 
 import java.util.Set;
 
@@ -25,9 +24,6 @@ public class MyApplication extends Application
     public static final int CONNECTING = 1;
     public static final int CONNECTION_SUCCEEDED = 0;
     public static final int CONNECTION_FAILED = -1;
-
-
-    SuperNode superNode;
 
     public void onCreate() {
         super.onCreate();
@@ -65,7 +61,6 @@ public class MyApplication extends Application
     public void setClient(int i) {
         clientClass=new ClientClass(btArray[i]);
         clientClass.start();
-
     }
 
     public int isSocketConnected() {
@@ -75,7 +70,5 @@ public class MyApplication extends Application
     public SendReceive getSendReceive() {
         return clientClass.getSendReceive();
     }
-
-    public SuperNode getSuperNode() {return superNode; }
 
 }

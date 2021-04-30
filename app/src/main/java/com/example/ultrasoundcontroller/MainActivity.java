@@ -1,5 +1,6 @@
 package com.example.ultrasoundcontroller;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -7,40 +8,41 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ultrasoundcontroller.BluetoothFunc.FragmentPairedDevices;
 import com.example.ultrasoundcontroller.Interface.Directory;
 import com.example.ultrasoundcontroller.Interface.GridViewAdapter;
-import com.example.ultrasoundcontroller.Interface.SuperNode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-
+    /* For debugging purposes only. */
     private static final String TAG = "MainActivity";
+
+    /* Bluetooth Functionality */
     public FloatingActionButton bluetoothImage;
-    public Button menu, back, add;
-    public TextView nameOfDirectory;
+
+    /* Directory Functions */
+    Button menu, back, add;
+    TextView nameOfDirectory;
     RecyclerView rv;
     Directory directory;
+    public SuperNode superNode;
     GridViewAdapter gridViewAdapter;
     Dialog addDialog;
 
@@ -48,7 +50,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /* Bluetooth Functionality */
         bluetoothImage = findViewById(R.id.bluetoothImage);
+
+        /* Directory Functions */
         menu = findViewById(R.id.menu);
         back = findViewById(R.id.back);
         add = findViewById(R.id.add);
@@ -56,29 +62,33 @@ public class MainActivity extends AppCompatActivity {
         nameOfDirectory = findViewById(R.id.name_of_directory);
         addDialog = new Dialog(this);
 
+        /* Bluetooth Functionality */
+        /* Turns the bluetooth on, if off. */
         enableBluetooth();
-        allListeners();
-        SuperNode sNode = loadData();
-        if(sNode == null) {
-            MyApplication.getApplication().superNode = new SuperNode();
-        } else {
-            MyApplication.getApplication().superNode = sNode;
 
-        }
-        createRecyclerView();
+        /* creates or loads the root directory. */
+        createRootDirectory();
+
+        /* onClick listener on all the buttons in this function. */
+        allListeners();
     }
 
-    private void createRecyclerView() {
-        String name_of_directory = "Organs";
+    private void createRootDirectory() {
+        String name_of_directory = "Simulations";
 
-        /* The root directory. */
-        if(!MyApplication.getApplication().getSuperNode().hashMap.isEmpty()) {
-            directory = new Directory(MyApplication.getApplication().getSuperNode().hashMap.get(0));
+        /* Does not have to create a new directory if already stored on device. */
+        superNode = loadData();
+        if(superNode == null) {
+            /* create a new root directory. */
+            superNode = new SuperNode();
+            directory = new Directory(0, -1,name_of_directory,null,"Folder");
+            superNode.add(0,directory);
+            /* Save the directory structure on the device. */
+            saveData(superNode);
         } else {
-            directory = new Directory(0, -1, name_of_directory, null, null);
-            saveData(MyApplication.getApplication().getSuperNode());
+            directory = superNode.hashMap.get(0);
         }
-        gridViewAdapter = new GridViewAdapter(MainActivity.this, directory);
+        gridViewAdapter = new GridViewAdapter(MainActivity.this, directory, superNode);
         rv.setAdapter(gridViewAdapter);
     }
 
@@ -108,19 +118,17 @@ public class MainActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int parent_directory_inode = gridViewAdapter.directory.parentDirectoryInode;
-                if( parent_directory_inode == 0) {
-                    reloadRecyclerView(MyApplication.getApplication().getSuperNode().hashMap.get(0));
-                    nameOfDirectory.setText(gridViewAdapter.directory.nameOfDirectory);
+                Directory parent_directory = superNode.hashMap.get(directory.parentDirectory);
+                reloadRecyclerView(parent_directory);
+                nameOfDirectory.setText(gridViewAdapter.directory.nameOfDirectory);
+                if(parent_directory.nameOfDirectory.equals("Simulations")) {
                     menu.setVisibility(View.VISIBLE);
                     back.setVisibility(View.INVISIBLE);
-                } else {
-                    reloadRecyclerView(MyApplication.getApplication().getSuperNode().hashMap.get(parent_directory_inode));
-                    nameOfDirectory.setText(gridViewAdapter.directory.nameOfDirectory);
                 }
             }
         });
 
+        /* This button is used to create directories (Folders or Files). */
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,75 +151,151 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                if(radioGroup.getCheckedRadioButtonId() == R.id.folder) {
-                    videoId.setVisibility(View.INVISIBLE);
-                } else {
-                    videoId.setVisibility(View.VISIBLE);
-                }
-
+                /* Note: do error checking here. */
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int images[] = {R.mipmap.ic_folder, R.mipmap.ic_play};
+                        /* Name of the directory. */
                         String name_of_dir = name.getText().toString();
 
-                        Directory clicked_dir;
-                        Directory current_dir = MyApplication.getApplication().getSuperNode().hashMap.get(directory.currentDirectoryInode);
-
-                        /* Get a new Inode number. */
-                        int inode = MyApplication.getApplication().getSuperNode().total_inode;
-
                         /* Create a new directory. */
-                        clicked_dir = new Directory(inode, directory.currentDirectoryInode, name_of_dir, null, null);
-
-                        /* Provide information to the parent directory about the new directory. */
-                        current_dir.inodes.add(inode);
+                        Directory new_directory;
+                        Integer inode = superNode.generateInode;
                         if(radioGroup.getCheckedRadioButtonId() == R.id.folder) {
-                            current_dir.images.add(images[0]);
-                            current_dir.type.add("Dir");
+                            new_directory = new Directory(inode, directory.directoryInode, name_of_dir,null, "Folder");
                         } else {
-                            current_dir.images.add(images[1]);
-                            current_dir.type.add("File");
-                            MyApplication.getApplication().getSuperNode().hashMap.get(inode).videoID = videoId.getText().toString();
+                            new_directory = new Directory(inode, directory.directoryInode, name_of_dir,videoId.getText().toString(), "File");
                         }
-                        current_dir.names.add(name_of_dir);
-
-
-
-
-                        /* Store the key value pair on the device. */
-//                        saveData(MyApplication.getApplication().getSuperNode());
-
-                        reloadRecyclerView(current_dir);
+                        superNode.add(inode,new_directory);
+                        /* Save the directory structure on the device. */
+                        directory.childDirectories.add(inode);
+                        saveData(superNode);
+                        /* Reload the view. */
+                        reloadRecyclerView(directory);
                         addDialog.dismiss();
                     }
                 });
-
                 addDialog.show();
-
-
             }
         });
 
     }
 
-    @Override
-    protected void onDestroy() {
-        restartSimulator();
-        super.onDestroy();
+    public void tileClick(int position) {
+
+        Directory current_dir = directory;
+        Directory clicked_dir = superNode.hashMap.get(current_dir.childDirectories.get(position));
+
+        if(clicked_dir.type.equals("Folder")) {
+            directory = clicked_dir;
+            String name = directory.nameOfDirectory;
+            if(name.length() > 12) {
+                name = name.substring(0,12) + "...";
+            }
+            nameOfDirectory.setText(name);
+            if (current_dir.nameOfDirectory.equals("Simulations")) {
+                menu.setVisibility(View.INVISIBLE);
+                back.setVisibility(View.VISIBLE);
+            }
+            reloadRecyclerView(directory);
+        } else {
+            if(MyApplication.getApplication().clientClass != null) {
+                String s = clicked_dir.videoID;
+                MyApplication.getApplication().getSendReceive().write(s.getBytes());
+            } else {
+                Toast.makeText(this,"Not connected to the Simulator", Toast.LENGTH_SHORT).show();
+            }
+        }
+
     }
 
-    private void saveData(SuperNode supernode) {
-        SharedPreferences sharedPreferences = getSharedPreferences("hashMap", MODE_PRIVATE);
+    public void editTile(int position) {
+        addDialog.setContentView(R.layout.edit_pop_up);
+
+        EditText name = addDialog.findViewById(R.id.name_the_directory);
+        Button btn = addDialog.findViewById(R.id.rename_directory);
+        EditText videoId = addDialog.findViewById(R.id.edit_video_id);
+        Directory current_dir = directory;
+        Directory clicked_dir = superNode.hashMap.get(current_dir.childDirectories.get(position));
+
+        name.setText(clicked_dir.nameOfDirectory);
+        if(clicked_dir.type.equals("File")) {
+            videoId.setVisibility(View.VISIBLE);
+            videoId.setText(clicked_dir.videoID);
+        }
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clicked_dir.nameOfDirectory = name.getText().toString();
+                if(clicked_dir.type.equals("File")) {
+                    clicked_dir.videoID = videoId.getText().toString();
+                }
+            saveData(superNode);
+            reloadRecyclerView(current_dir);
+            addDialog.dismiss();
+            }
+
+        });
+
+
+        addDialog.show();
+    }
+
+    public void deleteTile(int position) {
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        Directory current_dir = directory;
+                        Directory clicked_dir = superNode.hashMap.get(current_dir.childDirectories.get(position));
+
+                        Directory tmp_dir = clicked_dir;
+                        Directory currentDir;
+                        int parentInode;
+
+                        do {
+                            while (tmp_dir.type.equals("Folder") && tmp_dir.childDirectories.size() != 0) {
+                                tmp_dir = superNode.hashMap.get(tmp_dir.childDirectories.get(0));
+                            }
+                            parentInode = tmp_dir.parentDirectory;
+                            currentDir = tmp_dir;
+                            superNode.hashMap.remove(tmp_dir.directoryInode);
+                            tmp_dir = superNode.hashMap.get(parentInode);
+                            tmp_dir.childDirectories.remove(currentDir.directoryInode);
+                        }while(current_dir.childDirectories.contains(clicked_dir.directoryInode));
+
+                        saveData(superNode);
+                        reloadRecyclerView(current_dir);
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Do you wish to permanently delete the Directory?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+
+    }
+
+
+
+    private void saveData(SuperNode superNode) {
+        SharedPreferences sharedPreferences = getSharedPreferences("superNode", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(supernode);
+        String json = gson.toJson(superNode);
         editor.putString("super_node", json);
         editor.apply();
     }
 
     private SuperNode loadData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("hashMap", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("superNode", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("super_node", null);
         Type type = new TypeToken<SuperNode>() {}.getType();
@@ -233,16 +317,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void reloadRecyclerView(Directory d) {
-        directory.change(d);
+        directory = d;
+        gridViewAdapter.superNode = superNode;
+        gridViewAdapter.directory = d;
         gridViewAdapter.notifyDataSetChanged();
-    }
-
-    public void onLongTileClick() {
-        addDialog.setContentView(R.layout.custom_pop_up);
-
-        EditText name = addDialog.findViewById(R.id.name_the_directory);
-        Button btn = addDialog.findViewById(R.id.create_directory);
-        RadioGroup radioGroup = addDialog.findViewById(R.id.type_of_directory);
     }
 
 }

@@ -6,8 +6,10 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import com.example.ultrasoundcontroller.Controller;
 import com.example.ultrasoundcontroller.MainActivity;
 import com.example.ultrasoundcontroller.MyApplication;
 import com.example.ultrasoundcontroller.R;
+import com.example.ultrasoundcontroller.SuperNode;
 
 import java.nio.InvalidMarkException;
 import java.util.ArrayList;
@@ -26,10 +29,12 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
 
     Context mCtx;
     public Directory directory;
+    public SuperNode superNode;
 
-    public GridViewAdapter(Context mCtx, Directory directory) {
+    public GridViewAdapter(Context mCtx, Directory directory, SuperNode superNode) {
         this.mCtx = mCtx;
         this.directory = directory;
+        this.superNode = superNode;
     }
 
     @NonNull
@@ -43,44 +48,37 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-            holder._name.setText(directory.names.get(position));
-            holder._image.setImageResource(directory.images.get(position));
+            String name = superNode.hashMap.get(directory.childDirectories.get(position)).nameOfDirectory;
+            if(name.length() > 5) {
+                name =  name.substring(0,5) + "...";
+            }
+            holder._name.setText(name);
 
-            holder._linearLayout.setOnClickListener(new View.OnClickListener() {
+
+            if(superNode.hashMap.get(directory.childDirectories.get(position)).type.equals("Folder")) {
+                holder._image.setImageResource(R.mipmap.ic_folder);
+            } else {
+                holder._image.setImageResource(R.mipmap.ic_play);
+            }
+
+            holder._image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Directory clicked_dir;
-                    Directory current_dir = MyApplication.getApplication().getSuperNode().hashMap.get(directory.currentDirectoryInode);
-                    int inode_of_clicked_dir = current_dir.inodes.get(position);
-
-                    clicked_dir = MyApplication.getApplication().getSuperNode().hashMap.get(inode_of_clicked_dir);
-
-                    if(current_dir.type.get(position).equals("Dir")) {
-                        /* Make some layout changes. */
-                        ((MainActivity) v.getContext()).nameOfDirectory.setText(clicked_dir.nameOfDirectory);
-                        if (directory.currentDirectoryInode == 0) {
-                            ((MainActivity) v.getContext()).menu.setVisibility(View.INVISIBLE);
-                            ((MainActivity) v.getContext()).back.setVisibility(View.VISIBLE);
-                        }
-                        ((MainActivity) v.getContext()).reloadRecyclerView(clicked_dir);
-                    } else {
-                        if(MyApplication.getApplication().clientClass != null) {
-                            String s = clicked_dir.videoID;
-                            MyApplication.getApplication().getSendReceive().write(s.getBytes());
-                        } else {
-                            Toast.makeText(mCtx,"Not connected to the Simulator", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-
+                    ((MainActivity) v.getContext()).tileClick(position);
                 }
             });
 
-            holder._linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            holder._edit.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onLongClick(View v) {
-                    ((MainActivity) v.getContext()).onLongTileClick();
-                    return true;
+                public void onClick(View v) {
+                    ((MainActivity) v.getContext()).editTile(position);
+                }
+            });
+
+            holder._delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((MainActivity) v.getContext()).deleteTile(position);
                 }
             });
 
@@ -95,13 +93,17 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
 
         TextView _name;
         ImageView _image;
-        LinearLayout _linearLayout;
+        RelativeLayout _edit;
+        Button _delete;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             _name = itemView.findViewById(R.id.name);
             _image = itemView.findViewById(R.id.image);
-            _linearLayout = itemView.findViewById(R.id.item);
+            _edit = itemView.findViewById(R.id.edit);
+            _delete = itemView.findViewById(R.id.delete);
 
         }
     }
+
+
 }

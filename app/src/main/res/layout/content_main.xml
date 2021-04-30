@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:text="Organs"
+                    android:text="Simulations"
                     android:fontFamily="@font/bariol_bold"
                     android:textColor="#FCFCFC"
                     android:textSize="20sp"/>
