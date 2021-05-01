@@ -2,6 +2,7 @@ package com.example.ultrasoundcontroller.Interface;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,23 +49,39 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-            String name = superNode.hashMap.get(directory.childDirectories.get(position)).nameOfDirectory;
+            Directory child_directory = superNode.hashMap.get(directory.childDirectories.get(position));
+            String name = child_directory.nameOfDirectory;
             if(name.length() > 5) {
                 name =  name.substring(0,5) + "...";
             }
             holder._name.setText(name);
 
-
-            if(superNode.hashMap.get(directory.childDirectories.get(position)).type.equals("Folder")) {
+            if(child_directory.type.equals("Folder")) {
                 holder._image.setImageResource(R.mipmap.ic_folder);
             } else {
                 holder._image.setImageResource(R.mipmap.ic_play);
+            }
+
+            if(((MainActivity) holder.itemView.getContext()).selected_directories.containsKey(child_directory.directoryInode)) {
+                holder._edit_delete_section.setBackgroundColor(Color.parseColor("#593B71AC"));
+            } else {
+                holder._edit_delete_section.setBackgroundColor(Color.parseColor("#FCFCFC"));
             }
 
             holder._image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ((MainActivity) v.getContext()).tileClick(position);
+                }
+            });
+
+            holder._image.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if(!((MainActivity) v.getContext()).rootDirectory.equals("Simulations")) {
+                        ((MainActivity) v.getContext()).tileLongClick(position);
+                    }
+                    return true;
                 }
             });
 
@@ -95,12 +112,14 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
         ImageView _image;
         RelativeLayout _edit;
         Button _delete;
+        RelativeLayout _edit_delete_section;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             _name = itemView.findViewById(R.id.name);
             _image = itemView.findViewById(R.id.image);
             _edit = itemView.findViewById(R.id.edit);
             _delete = itemView.findViewById(R.id.delete);
+            _edit_delete_section = itemView.findViewById(R.id.edit_delete_section);
 
         }
     }

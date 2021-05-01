@@ -24,7 +24,8 @@
         android:id="@+id/item"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+       >
 
         <ImageView
             android:id="@+id/image"
@@ -32,12 +33,13 @@
             android:layout_height="@dimen/img_card_height"
             android:contentDescription="@string/app_name"
             android:scaleType="fitCenter"
-            android:src="@mipmap/ic_heart" />
+            android:src="@mipmap/ic_folder" />
 
         <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-            >
+            android:id="@+id/edit_delete_section"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+           >
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

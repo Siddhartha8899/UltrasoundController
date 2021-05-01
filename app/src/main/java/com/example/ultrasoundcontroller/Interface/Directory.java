@@ -25,7 +25,7 @@ public class Directory {
         this.videoID = videoID;
         this.type = type;
 
-        if(type == "Folder") {
+        if(type.equals("Folder")) {
             this.childDirectories = new Vector<Integer>();
         }
     }

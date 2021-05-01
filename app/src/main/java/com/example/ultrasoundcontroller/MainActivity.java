@@ -1,5 +1,6 @@
 package com.example.ultrasoundcontroller;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -12,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,13 +25,14 @@ import com.example.ultrasoundcontroller.BluetoothFunc.FragmentPairedDevices;
 import com.example.ultrasoundcontroller.Interface.Directory;
 import com.example.ultrasoundcontroller.Interface.GridViewAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     /* For debugging purposes only. */
     private static final String TAG = "MainActivity";
@@ -38,13 +41,15 @@ public class MainActivity extends AppCompatActivity {
     public FloatingActionButton bluetoothImage;
 
     /* Directory Functions */
-    Button menu, back, add;
+    Button menu, back, add, copy, paste;
     TextView nameOfDirectory;
     RecyclerView rv;
     Directory directory;
     public SuperNode superNode;
     GridViewAdapter gridViewAdapter;
     Dialog addDialog;
+    public String rootDirectory;
+    public HashMap<Integer, Directory> selected_directories, copied_directories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,31 +63,44 @@ public class MainActivity extends AppCompatActivity {
         menu = findViewById(R.id.menu);
         back = findViewById(R.id.back);
         add = findViewById(R.id.add);
+        copy = findViewById(R.id.copy);
+        paste = findViewById(R.id.paste);
         rv = findViewById(R.id.organs);
         nameOfDirectory = findViewById(R.id.name_of_directory);
         addDialog = new Dialog(this);
+        rootDirectory = "Simulations";
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        selected_directories = new HashMap<>();
+        copied_directories = new HashMap<>();
 
         /* Bluetooth Functionality */
         /* Turns the bluetooth on, if off. */
         enableBluetooth();
 
         /* creates or loads the root directory. */
-        createRootDirectory();
+        createRootDirectories();
 
         /* onClick listener on all the buttons in this function. */
         allListeners();
     }
 
-    private void createRootDirectory() {
-        String name_of_directory = "Simulations";
+    private void createRootDirectories() {
+        String name_of_first_directory = "Simulations";
+        String name_of_second_directory = "Organs";
 
         /* Does not have to create a new directory if already stored on device. */
         superNode = loadData();
         if(superNode == null) {
             /* create a new root directory. */
             superNode = new SuperNode();
-            directory = new Directory(0, -1,name_of_directory,null,"Folder");
+
+            directory = new Directory(1, -1,name_of_second_directory,null,"Folder");
+            superNode.add(1,directory);
+
+            directory = new Directory(0, -1,name_of_first_directory,null,"Folder");
             superNode.add(0,directory);
+
             /* Save the directory structure on the device. */
             saveData(superNode);
         } else {
@@ -112,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawer.openDrawer(GravityCompat.START);
+
             }
         });
 
@@ -121,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 Directory parent_directory = superNode.hashMap.get(directory.parentDirectory);
                 reloadRecyclerView(parent_directory);
                 nameOfDirectory.setText(gridViewAdapter.directory.nameOfDirectory);
-                if(parent_directory.nameOfDirectory.equals("Simulations")) {
+                if(parent_directory.parentDirectory == -1) {
                     menu.setVisibility(View.VISIBLE);
                     back.setVisibility(View.INVISIBLE);
                 }
@@ -179,6 +198,62 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        copy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                Toast.makeText(v.getContext(), "Copied! Please paste in Simulations directory", Toast.LENGTH_LONG).show();
+                                copied_directories.putAll(selected_directories);
+                                selected_directories.clear();
+                                reloadRecyclerView(directory);
+                                add.setVisibility(View.VISIBLE);
+                                copy.setVisibility(View.INVISIBLE);
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                selected_directories.clear();
+                                reloadRecyclerView(directory);
+                                add.setVisibility(View.VISIBLE);
+                                copy.setVisibility(View.INVISIBLE);
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setMessage("Do you wish to copy " + selected_directories.size() + " directories?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+            }
+        });
+
+        paste.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (copied_directories.isEmpty()) {
+                    Toast.makeText(v.getContext(), "No directories copied!", Toast.LENGTH_LONG).show();
+                } else {
+                    for (Directory dir : copied_directories.values()) {
+
+                        Directory new_directory;
+
+
+
+
+
+                        /* Save the directory structure on the device. */
+                        saveData(superNode);
+                        /* Reload the view. */
+                        reloadRecyclerView(directory);
+                    }
+                }
+            }
+        });
+
+
     }
 
     public void tileClick(int position) {
@@ -193,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                 name = name.substring(0,12) + "...";
             }
             nameOfDirectory.setText(name);
-            if (current_dir.nameOfDirectory.equals("Simulations")) {
+            if (current_dir.parentDirectory == -1) {
                 menu.setVisibility(View.INVISIBLE);
                 back.setVisibility(View.VISIBLE);
             }
@@ -206,6 +281,26 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,"Not connected to the Simulator", Toast.LENGTH_SHORT).show();
             }
         }
+
+    }
+
+    public void tileLongClick(int position) {
+
+        Directory current_dir = directory;
+        Directory clicked_dir = superNode.hashMap.get(current_dir.childDirectories.get(position));
+        if(selected_directories.containsKey(clicked_dir.directoryInode)) {
+            selected_directories.remove(clicked_dir.directoryInode);
+        } else {
+            selected_directories.put(clicked_dir.directoryInode, current_dir);
+        }
+        if(!selected_directories.isEmpty()) {
+            add.setVisibility(View.INVISIBLE);
+            copy.setVisibility(View.VISIBLE);
+        } else {
+            add.setVisibility(View.VISIBLE);
+            copy.setVisibility(View.INVISIBLE);
+        }
+        reloadRecyclerView(current_dir);
 
     }
 
@@ -283,8 +378,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     private void saveData(SuperNode superNode) {
         SharedPreferences sharedPreferences = getSharedPreferences("superNode", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -323,5 +416,33 @@ public class MainActivity extends AppCompatActivity {
         gridViewAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.simulations_directory) {
+            Directory clicked_dir = superNode.hashMap.get(0);
+            rootDirectory = clicked_dir.nameOfDirectory;
+            nameOfDirectory.setText(rootDirectory);
+            menu.setVisibility(View.VISIBLE);
+            back.setVisibility(View.INVISIBLE);
+            paste.setVisibility(View.VISIBLE);
+            reloadRecyclerView(clicked_dir);
+            rootDirectory = "Simulations";
+
+        } else if (id == R.id.organ_directory) {
+            Directory clicked_dir = superNode.hashMap.get(1);
+            rootDirectory = clicked_dir.nameOfDirectory;
+            nameOfDirectory.setText(rootDirectory);
+            menu.setVisibility(View.VISIBLE);
+            back.setVisibility(View.INVISIBLE);
+            paste.setVisibility(View.INVISIBLE);
+            reloadRecyclerView(clicked_dir);
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 }
 

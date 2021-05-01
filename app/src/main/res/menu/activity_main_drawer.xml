@@ -5,10 +5,14 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_baseline_add_24"
-            android:title="Add more stuff" />
+            android:id="@+id/simulations_directory"
+            android:icon="@drawable/ic_baseline_folder_open_24"
 
+            android:title="Simulations" />
+        <item
+            android:id="@+id/organ_directory"
+            android:icon="@drawable/ic_baseline_folder_open_24"
+            android:title="Organs" />
     </group>
 
 </menu>
