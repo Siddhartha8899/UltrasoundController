@@ -31,6 +31,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -284,21 +285,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public void tileLongClick(int position) {
+    public void checkBoxClick(int position) {
 
         Directory current_dir = directory;
-        Directory clicked_dir = superNode.hashMap.get(current_dir.childDirectories.get(position));
-        if(selected_directories.containsKey(clicked_dir.directoryInode)) {
-            selected_directories.remove(clicked_dir.directoryInode);
+        int clicked_dir_inode = current_dir.childDirectories.get(position);
+        if(selected_directories.containsKey(clicked_dir_inode)) {
+            selected_directories.remove(clicked_dir_inode);
         } else {
-            selected_directories.put(clicked_dir.directoryInode, current_dir);
-        }
-        if(!selected_directories.isEmpty()) {
-            add.setVisibility(View.INVISIBLE);
-            copy.setVisibility(View.VISIBLE);
-        } else {
-            add.setVisibility(View.VISIBLE);
-            copy.setVisibility(View.INVISIBLE);
+            selected_directories.put(clicked_dir_inode, current_dir);
         }
         reloadRecyclerView(current_dir);
 
@@ -344,23 +338,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         Directory current_dir = directory;
-                        Directory clicked_dir = superNode.hashMap.get(current_dir.childDirectories.get(position));
+                        int clicked_directory_inode = current_dir.childDirectories.get(position);
 
-                        Directory tmp_dir = clicked_dir;
-                        Directory currentDir;
-                        int parentInode;
+                        Stack<Integer> depth_first = new Stack<>();
+                        depth_first.push(clicked_directory_inode);
+                        Directory tmp_dir;
+                        int tmp_dir_inode;
 
                         do {
-                            while (tmp_dir.type.equals("Folder") && tmp_dir.childDirectories.size() != 0) {
-                                tmp_dir = superNode.hashMap.get(tmp_dir.childDirectories.get(0));
+                            tmp_dir_inode = depth_first.pop();
+                            tmp_dir = superNode.hashMap.get(tmp_dir_inode);
+                            for (int i = 0; tmp_dir.type.equals("Folder") && i < tmp_dir.childDirectories.size(); i++) {
+                                depth_first.push(tmp_dir.childDirectories.get(i));
                             }
-                            parentInode = tmp_dir.parentDirectory;
-                            currentDir = tmp_dir;
                             superNode.hashMap.remove(tmp_dir.directoryInode);
-                            tmp_dir = superNode.hashMap.get(parentInode);
-                            tmp_dir.childDirectories.remove(currentDir.directoryInode);
-                        }while(current_dir.childDirectories.contains(clicked_dir.directoryInode));
+                        } while(!depth_first.isEmpty());
 
+                        current_dir.childDirectories.removeElement(clicked_directory_inode);
                         saveData(superNode);
                         reloadRecyclerView(current_dir);
                         break;
@@ -413,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         directory = d;
         gridViewAdapter.superNode = superNode;
         gridViewAdapter.directory = d;
-        gridViewAdapter.notifyDataSetChanged();
+       gridViewAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -427,6 +421,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             menu.setVisibility(View.VISIBLE);
             back.setVisibility(View.INVISIBLE);
             paste.setVisibility(View.VISIBLE);
+            copy.setVisibility(View.INVISIBLE);
             reloadRecyclerView(clicked_dir);
             rootDirectory = "Simulations";
 
@@ -437,6 +432,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             menu.setVisibility(View.VISIBLE);
             back.setVisibility(View.INVISIBLE);
             paste.setVisibility(View.INVISIBLE);
+            copy.setVisibility(View.VISIBLE);
             reloadRecyclerView(clicked_dir);
         }
 
