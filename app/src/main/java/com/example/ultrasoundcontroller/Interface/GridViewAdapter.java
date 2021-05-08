@@ -63,16 +63,12 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
                 holder._image.setImageResource(R.drawable.ic_play);
             }
 
-            if(!((MainActivity) holder.itemView.getContext()).rootDirectory.equals("Simulations")) {
-                holder.select.setVisibility(View.VISIBLE);
-            }
-
-            if(((MainActivity) holder.itemView.getContext()).selected_directories.containsKey(child_directory.directoryInode)) {
-                holder.select.setChecked(true);
-
+            if( ((MainActivity) holder.itemView.getContext()).selected_directories.containsKey(child_directory.directoryInode)) {
+                holder._image.setBackgroundColor(Color.parseColor("#A52A2A"));
+                holder._edit_delete_section.setBackgroundColor(Color.parseColor("#A52A2A"));
             } else {
-                holder.select.setChecked(false);
-
+                holder._image.setBackgroundColor(Color.parseColor("#000000"));
+                holder._edit_delete_section.setBackgroundColor(Color.parseColor("#000000"));
             }
 
 
@@ -83,14 +79,6 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
                 }
             });
 
-            holder.select.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(!((MainActivity) v.getContext()).rootDirectory.equals("Simulations")) {
-                        ((MainActivity) v.getContext()).checkBoxClick(position);
-                    }
-                }
-            });
 
             holder._edit.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -106,6 +94,13 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
                 }
             });
 
+            holder._click.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!((MainActivity) v.getContext()).rootDirectory.equals("Simulations"))
+                            ((MainActivity) v.getContext()).tileLongClick(position);
+                }
+            });
     }
 
     @Override
@@ -118,9 +113,8 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
         TextView _name;
         ImageView _image;
         RelativeLayout _edit;
-        Button _delete;
+        Button _delete, _click;
         RelativeLayout _edit_delete_section;
-        CheckBox select;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             _name = itemView.findViewById(R.id.name);
@@ -128,7 +122,7 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
             _edit = itemView.findViewById(R.id.edit);
             _delete = itemView.findViewById(R.id.delete);
             _edit_delete_section = itemView.findViewById(R.id.edit_delete_section);
-            select = itemView.findViewById(R.id.select);
+            _click = itemView.findViewById(R.id.click);
 
         }
     }

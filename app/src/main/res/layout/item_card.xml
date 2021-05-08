@@ -61,14 +61,16 @@
                 android:layout_height="18dp"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/ic_baseline_delete_forever_24" />
-            <CheckBox
-                android:id="@+id/select"
-                android:layout_width="25dp"
-                android:layout_height="20dp"
+            <Button
+                android:id="@+id/click"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_alignParentLeft="true"
-                android:visibility="invisible"
+                android:background="@drawable/ic_baseline_double_arrow_24"
                 />
         </RelativeLayout>
+
+
 
 
     </LinearLayout>

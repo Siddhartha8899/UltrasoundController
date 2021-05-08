@@ -31,6 +31,8 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         /* Turns the bluetooth on, if off. */
         enableBluetooth();
 
-        /* creates or loads the root directory. */
+        /* creates or loads the root directories. */
         createRootDirectories();
 
         /* onClick listener on all the buttons in this function. */
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             directory = superNode.hashMap.get(0);
         }
-        gridViewAdapter = new GridViewAdapter(MainActivity.this, directory, superNode);
+        gridViewAdapter = new GridViewAdapter(this, directory, superNode);
         rv.setAdapter(gridViewAdapter);
     }
 
@@ -211,15 +213,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 copied_directories.putAll(selected_directories);
                                 selected_directories.clear();
                                 reloadRecyclerView(directory);
-                                add.setVisibility(View.VISIBLE);
-                                copy.setVisibility(View.INVISIBLE);
                                 break;
 
                             case DialogInterface.BUTTON_NEGATIVE:
                                 selected_directories.clear();
                                 reloadRecyclerView(directory);
-                                add.setVisibility(View.VISIBLE);
-                                copy.setVisibility(View.INVISIBLE);
                                 break;
                         }
                     }
@@ -238,18 +236,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Toast.makeText(v.getContext(), "No directories copied!", Toast.LENGTH_LONG).show();
                 } else {
                     for (Directory dir : copied_directories.values()) {
+                        Queue<Integer> qe=new LinkedList<Integer>();
+                        qe.add(dir.directoryInode);
+                        qe.add(directory.directoryInode);
 
-                        Directory new_directory;
+                        Directory tmp_dir, parent_dir;
+                        do {
+                            Directory new_directory;
+                            tmp_dir = superNode.hashMap.get(qe.poll());
+                            parent_dir = superNode.hashMap.get(qe.poll());
 
+                            int new_directory_inode = superNode.generateInode;
 
+                            if(tmp_dir.type.equals("Folder")) {
+                                 new_directory = new Directory(new_directory_inode, parent_dir.directoryInode, tmp_dir.nameOfDirectory, null, "Folder");
+                            } else {
+                                new_directory = new Directory(new_directory_inode, parent_dir.directoryInode, tmp_dir.nameOfDirectory, tmp_dir.videoID, "File");
+                            }
+                            parent_dir.childDirectories.add(new_directory_inode);
+                            superNode.add(new_directory_inode,new_directory);
 
+                            for(int i = 0; tmp_dir.type.equals("Folder") && i< tmp_dir.childDirectories.size();i++) {
+                                qe.add(tmp_dir.childDirectories.get(i));
+                                qe.add(new_directory_inode);
+                            }
+                        } while(!qe.isEmpty());
 
-
-                        /* Save the directory structure on the device. */
-                        saveData(superNode);
-                        /* Reload the view. */
-                        reloadRecyclerView(directory);
                     }
+
+                    /* Save the directory structure on the device. */
+                    saveData(superNode);
+                    /* Reload the view. */
+                    reloadRecyclerView(directory);
+                    copied_directories.clear();
                 }
             }
         });
@@ -285,14 +304,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public void checkBoxClick(int position) {
+    public void tileLongClick(int position) {
 
         Directory current_dir = directory;
         int clicked_dir_inode = current_dir.childDirectories.get(position);
         if(selected_directories.containsKey(clicked_dir_inode)) {
             selected_directories.remove(clicked_dir_inode);
         } else {
-            selected_directories.put(clicked_dir_inode, current_dir);
+            selected_directories.put(clicked_dir_inode, superNode.hashMap.get(clicked_dir_inode));
         }
         reloadRecyclerView(current_dir);
 
@@ -439,6 +458,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(directory.parentDirectory != -1) {
+            Directory parent_directory = superNode.hashMap.get(directory.parentDirectory);
+            reloadRecyclerView(parent_directory);
+            nameOfDirectory.setText(gridViewAdapter.directory.nameOfDirectory);
+            if(parent_directory.parentDirectory == -1) {
+                menu.setVisibility(View.VISIBLE);
+                back.setVisibility(View.INVISIBLE);
+            }
+        } else {
+            super.onBackPressed();
+        }
+
     }
 }
 
