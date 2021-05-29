@@ -1,31 +1,21 @@
 package com.example.ultrasoundcontroller.Interface;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.ultrasoundcontroller.Controller;
 import com.example.ultrasoundcontroller.MainActivity;
-import com.example.ultrasoundcontroller.MyApplication;
 import com.example.ultrasoundcontroller.R;
 import com.example.ultrasoundcontroller.SuperNode;
-
-import java.nio.InvalidMarkException;
-import java.util.ArrayList;
 
 public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyViewHolder> {
 
@@ -51,19 +41,23 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
             Directory child_directory = superNode.hashMap.get(directory.childDirectories.get(position));
+
+            /* The name of the directory, only 27 characters visible. */
             String name = child_directory.nameOfDirectory;
             if(name.length() > 27) {
                 name =  name.substring(0,27) + "...";
             }
             holder._name.setText(name);
 
+            /* Deciding which icon to put. */
             if(child_directory.type.equals("Folder")) {
                 holder._image.setImageResource(R.drawable.ic_f);
             } else {
                 holder._image.setImageResource(R.drawable.ic_play);
             }
 
-            if( ((MainActivity) holder.itemView.getContext()).selected_directories.containsKey(child_directory.directoryInode)) {
+            /* If directory is selection then it will change the background color of the directory to "#A52A2A" */
+            if( ((MainActivity) mCtx).selected_directories.containsKey(child_directory.directoryInode)) {
                 holder._image.setBackgroundColor(Color.parseColor("#A52A2A"));
                 holder._edit_delete_section.setBackgroundColor(Color.parseColor("#A52A2A"));
             } else {
@@ -71,34 +65,36 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.MyView
                 holder._edit_delete_section.setBackgroundColor(Color.parseColor("#000000"));
             }
 
-
+            /* When the image is clicked, the directory is opened. */
             holder._image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity) v.getContext()).tileClick(position);
+                    ((MainActivity) mCtx).tileClick(position);
                 }
             });
 
-
+            /* When the text is clicked, the rename window is opened. */
             holder._edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity) v.getContext()).editTile(position);
+                    ((MainActivity) mCtx).editTile(position);
                 }
             });
 
+            /* When the delete button is clicked, the directory is deleted. */
             holder._delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity) v.getContext()).deleteTile(position);
+                    ((MainActivity) mCtx).deleteTile(position);
                 }
             });
 
+            /* When the SMALL BUTTON is clicked, the directory is selected. */
             holder._click.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!((MainActivity) v.getContext()).rootDirectory.equals("Simulations"))
-                            ((MainActivity) v.getContext()).tileLongClick(position);
+                    if(!((MainActivity) mCtx).rootDirectory.equals("Simulations"))
+                            ((MainActivity) mCtx).tileSelected(position);
                 }
             });
     }

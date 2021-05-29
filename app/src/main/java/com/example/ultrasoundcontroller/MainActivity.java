@@ -40,10 +40,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /* For debugging purposes only. */
     private static final String TAG = "MainActivity";
 
-    /* Bluetooth Functionality */
+    /* Bluetooth Functionality variables declaration */
     public FloatingActionButton bluetoothImage;
 
-    /* Directory Functions */
+    /* Directory Functionality variables declaration */
     Button menu, back, add, copy, paste;
     TextView nameOfDirectory;
     RecyclerView rv;
@@ -59,10 +59,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /* Bluetooth Functionality */
+        /* Bluetooth Functionality variable definition */
         bluetoothImage = findViewById(R.id.bluetoothImage);
 
-        /* Directory Functions */
+        /* Directory Functionality variable definition */
         menu = findViewById(R.id.menu);
         back = findViewById(R.id.back);
         add = findViewById(R.id.add);
@@ -92,32 +92,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String name_of_first_directory = "Simulations";
         String name_of_second_directory = "Organs";
 
-        /* Does not have to create a new directory if already stored on device. */
+        /* Does not have to create a new directory if the directory structure is already stored on device. */
         superNode = loadData();
         if(superNode == null) {
-            /* create a new root directory. */
+            /* SuperNode stores all the directories. */
             superNode = new SuperNode();
 
+            /* Create the Organs directory. */
             directory = new Directory(1, -1,name_of_second_directory,null,"Folder");
             superNode.add(1,directory);
 
+            /* Create the Simulations directory. */
             directory = new Directory(0, -1,name_of_first_directory,null,"Folder");
             superNode.add(0,directory);
 
             /* Save the directory structure on the device. */
             saveData(superNode);
         } else {
+            /* If the directory structure is saved on the device, directly get the 'simulations' directory. */
             directory = superNode.hashMap.get(0);
         }
+
+        /* Represent the 'Simulations' directory on the device. */
         gridViewAdapter = new GridViewAdapter(this, directory, superNode);
         rv.setAdapter(gridViewAdapter);
     }
 
     private void allListeners() {
 
+        /* Shows the list of all the paired devices. */
         bluetoothImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /* Bluetooth should be enabled to see the paired devices list. */
                 if(!MyApplication.getApplication().isBluetoothEnabled()) {
                     Toast.makeText(getApplicationContext(),"Please turn the Bluetooth on", Toast.LENGTH_SHORT).show();
                 } else {
@@ -127,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-
+        /* Clicking on the menu button open up a side navigation bar, with two directories 'Simulations' and 'Organs'. */
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,12 +144,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        /* clicking on the back button changes the current directory to the parent directory. */
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Directory parent_directory = superNode.hashMap.get(directory.parentDirectory);
                 reloadRecyclerView(parent_directory);
                 nameOfDirectory.setText(gridViewAdapter.directory.nameOfDirectory);
+
+                /*If the parent directory is either the 'simulations' or the 'organs' directory then the back button becomes invisible. (as it is not required) */
                 if(parent_directory.parentDirectory == -1) {
                     menu.setVisibility(View.VISIBLE);
                     back.setVisibility(View.INVISIBLE);
@@ -161,7 +171,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Button btn = addDialog.findViewById(R.id.create_directory);
                 RadioGroup radioGroup = addDialog.findViewById(R.id.type_of_directory);
                 EditText videoId = addDialog.findViewById(R.id.video_id);
+                TextView errorText = addDialog.findViewById(R.id.error);
 
+                /* The 'id' field becomes visible when the file radio button is selected. */
                 radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -173,12 +185,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-                /* Note: do error checking here. */
+                /* After the 'create' button is clicked, all the details are stored and a directory is created! */
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         /* Name of the directory. */
                         String name_of_dir = name.getText().toString();
+
+                        /* Error, if name of  directory is null or the id of a video is null. */
+                        if(name_of_dir.equals("") || (radioGroup.getCheckedRadioButtonId() == R.id.file && videoId.getText().toString().equals("") )) {
+                            errorText.setVisibility(View.VISIBLE);
+                            return;
+                        }
 
                         /* Create a new directory. */
                         Directory new_directory;
@@ -189,9 +207,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             new_directory = new Directory(inode, directory.directoryInode, name_of_dir,videoId.getText().toString(), "File");
                         }
                         superNode.add(inode,new_directory);
-                        /* Save the directory structure on the device. */
+
+                        /* Add the new directory in the parent directory. */
                         directory.childDirectories.add(inode);
+
+                        /* Save the directory structure on the device. */
                         saveData(superNode);
+
                         /* Reload the view. */
                         reloadRecyclerView(directory);
                         addDialog.dismiss();
@@ -208,13 +230,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
+                            /* Directories are copied and selected directories are unselected. */
                             case DialogInterface.BUTTON_POSITIVE:
-                                Toast.makeText(v.getContext(), "Copied! Please paste in Simulations directory", Toast.LENGTH_LONG).show();
+                                Toast.makeText(v.getContext(), "Copied!", Toast.LENGTH_LONG).show();
                                 copied_directories.putAll(selected_directories);
                                 selected_directories.clear();
                                 reloadRecyclerView(directory);
                                 break;
 
+                            /* Directories are not copied and selected directories are unselected. */
                             case DialogInterface.BUTTON_NEGATIVE:
                                 selected_directories.clear();
                                 reloadRecyclerView(directory);
@@ -281,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Directory current_dir = directory;
         Directory clicked_dir = superNode.hashMap.get(current_dir.childDirectories.get(position));
 
+        /* If directory is a folder, it opens the folder. */
         if(clicked_dir.type.equals("Folder")) {
             directory = clicked_dir;
             String name = directory.nameOfDirectory;
@@ -293,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 back.setVisibility(View.VISIBLE);
             }
             reloadRecyclerView(directory);
+        /* If directory is a file, it sends the ID to the simulator, given the the simulator device is connected. */
         } else {
             if(MyApplication.getApplication().clientClass != null) {
                 String s = clicked_dir.videoID;
@@ -304,8 +330,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public void tileLongClick(int position) {
+    public void tileSelected(int position) {
 
+        /* Adds the selected directories in a vector. */
         Directory current_dir = directory;
         int clicked_dir_inode = current_dir.childDirectories.get(position);
         if(selected_directories.containsKey(clicked_dir_inode)) {
@@ -325,8 +352,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         EditText videoId = addDialog.findViewById(R.id.edit_video_id);
         Directory current_dir = directory;
         Directory clicked_dir = superNode.hashMap.get(current_dir.childDirectories.get(position));
+        TextView error = addDialog.findViewById(R.id.error);
 
         name.setText(clicked_dir.nameOfDirectory);
+
         if(clicked_dir.type.equals("File")) {
             videoId.setVisibility(View.VISIBLE);
             videoId.setText(clicked_dir.videoID);
@@ -334,17 +363,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /* Error, if name of  directory is null or the id of a video is null. */
+                if (name.getText().toString().equals("") || (clicked_dir.type.equals("File") && videoId.getText().toString().equals(""))) {
+                    error.setVisibility(View.VISIBLE);
+                    return;
+                }
                 clicked_dir.nameOfDirectory = name.getText().toString();
                 if(clicked_dir.type.equals("File")) {
                     clicked_dir.videoID = videoId.getText().toString();
                 }
-            saveData(superNode);
-            reloadRecyclerView(current_dir);
-            addDialog.dismiss();
+                saveData(superNode);
+                reloadRecyclerView(current_dir);
+                addDialog.dismiss();
             }
 
         });
-
 
         addDialog.show();
     }
@@ -426,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         directory = d;
         gridViewAdapter.superNode = superNode;
         gridViewAdapter.directory = d;
-       gridViewAdapter.notifyDataSetChanged();
+        gridViewAdapter.notifyDataSetChanged();
     }
 
     @Override

@@ -84,6 +84,16 @@
 
         />
 
+    <TextView
+        android:id="@+id/error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please fill all the fields"
+        android:textColor="#FB1B1B"
+        android:textSize="15sp"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible"/>
+
 
 
 </LinearLayout>
