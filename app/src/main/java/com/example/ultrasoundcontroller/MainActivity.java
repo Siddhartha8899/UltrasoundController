@@ -226,31 +226,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         copy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            /* Directories are copied and selected directories are unselected. */
-                            case DialogInterface.BUTTON_POSITIVE:
-                                Toast.makeText(v.getContext(), "Copied!", Toast.LENGTH_LONG).show();
-                                copied_directories.putAll(selected_directories);
-                                selected_directories.clear();
-                                reloadRecyclerView(directory);
-                                break;
+                if(!selected_directories.isEmpty()) {
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                /* Directories are copied and selected directories are unselected. */
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    Toast.makeText(v.getContext(), "Copied!", Toast.LENGTH_LONG).show();
+                                    copied_directories.putAll(selected_directories);
+                                    selected_directories.clear();
+                                    reloadRecyclerView(directory);
+                                    break;
 
-                            /* Directories are not copied and selected directories are unselected. */
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                selected_directories.clear();
-                                reloadRecyclerView(directory);
-                                break;
+                                /* Directories are not copied and selected directories are unselected. */
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    selected_directories.clear();
+                                    reloadRecyclerView(directory);
+                                    break;
+                            }
                         }
-                    }
-                };
+                    };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setMessage("Do you wish to copy " + selected_directories.size() + " directories?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Do you wish to copy " + selected_directories.size() + " directories?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
             }
+            else {
+                Toast.makeText(v.getContext(), "No directories selected!", Toast.LENGTH_LONG).show();
+            }
+
+
+        }
         });
 
         paste.setOnClickListener(new View.OnClickListener() {
@@ -323,6 +330,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if(MyApplication.getApplication().clientClass != null) {
                 String s = clicked_dir.videoID;
                 MyApplication.getApplication().getSendReceive().write(s.getBytes());
+
+                addDialog.setContentView(R.layout.play_pop_up);
+                Button play = addDialog.findViewById(R.id.play);
+                Button pause = addDialog.findViewById(R.id.pause);
+
+                play.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String s = "resume";
+                        MyApplication.getApplication().getSendReceive().write(s.getBytes());
+                    }
+                });
+
+                pause.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String s = "pause";
+                        MyApplication.getApplication().getSendReceive().write(s.getBytes());
+                    }
+                });
+
+                addDialog.show();
+
+
             } else {
                 Toast.makeText(this,"Not connected to the Simulator", Toast.LENGTH_SHORT).show();
             }
